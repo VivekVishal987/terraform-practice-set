@@ -6,5 +6,6 @@ resource "aws_instance" "dev" {
     tags = {
     Name = each.value
   }
+  
 }
     
