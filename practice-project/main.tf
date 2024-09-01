@@ -1,17 +1,22 @@
 resource "aws_vpc" "dev" {
     cidr_block = var.vpc-cidr
+    enable_dns_support = true
+    enable_dns_hostnames = true
     tags = {
       Name= "main-vpc"
     }
 }
 resource "aws_subnet" "public" {
-    cidr_block = var.subnet-cidr
+    count = 2
     vpc_id = aws_vpc.dev.id
-    availability_zone = var.availability-zone
-    tags = {
-      Name = "main-public-subnet"
-    }
+    cidr_block =  element(var.public_subnet_cidrs, count.index)
+    availability_zone =  element(var.availability_zones, count.index)
+    map_public_ip_on_launch = true
+      tags = {
+    Name = "public-subnet-${count.index + 1}"
+  }
 }
+    
 
 resource "aws_internet_gateway" "dev" {
     vpc_id = aws_vpc.dev.id
@@ -31,9 +36,9 @@ resource "aws_route_table" "dev" {
 
 }
 resource "aws_route_table_association" "dev" {
-    subnet_id = aws_subnet.public.id
-    route_table_id = aws_route_table.dev.id
-  
+  count          = length(aws_subnet.public)
+  route_table_id = aws_route_table.dev.id
+  subnet_id      = aws_subnet.public[count.index].id
 }
 
 resource "aws_security_group" "dev" {
@@ -62,6 +67,9 @@ resource "aws_security_group" "dev" {
     Name = "main-project"
   }
 }
+
+
+
 
         
 
