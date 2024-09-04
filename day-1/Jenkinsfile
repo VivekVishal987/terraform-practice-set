@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Terraform Commands') {
+            steps {
+                dir('day-1') {  // Replace with the relative path to your Terraform directory
+                    // Initialize Terraform
+                    sh 'terraform init'
+
+                    // Create a Terraform plan
+                    sh 'terraform plan'
+
+                    // Apply the Terraform plan
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+    }
+}
+    
